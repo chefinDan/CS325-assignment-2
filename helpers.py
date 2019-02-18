@@ -1,4 +1,16 @@
-# def fileToList()
+# Function to return the minimum value of three numbers
+
+def min(num1, num2, num3):
+
+    if num1 <= num2 and num1 <= num3:
+        return num1
+    elif num2 <= num1 and num2 <= num3:
+        return num2
+    else:
+        return num3
+
+
+# def seqFileToList()
 # Takes a string filename as argument, returns a list of dicts
 # Each element of the list has the following format:
 #
@@ -7,9 +19,8 @@
 #    'seqB': TCAGGTTAACAC...
 # }
 
-
-def fileToList(filename):
-    E = list()
+def seqFileToList(filename):
+    listOfPairs = list()
 
     with open(filename, 'r') as file:
         for rawline in file:
@@ -18,13 +29,57 @@ def fileToList(filename):
             for l in rawline.split(','):
                 tmp.append(l.strip('\n'))
 
-            E.append({'seqA': tmp[0], 'seqB': tmp[1]})
+            listOfPairs.append({'seqA': tmp[0], 'seqB': tmp[1]})
 
-    return E
+    return listOfPairs
 
 
-# def getSeq(E[n], int seq)
-# This function takes a dict object from E and a number indicating
+# function to put imp2cost.txt into a 2-d list
+def costFileToList(filename):
+    rawCostList = list()
+    costList = dict()
+
+    with open(filename, 'r') as file:
+        for rawline in file:
+            line = rawline.strip('\n').split(',')
+            rawCostList.append(line)
+
+    for i in range(1, 6):
+        for j in rawCostList[i]:
+            costList[j] = rawCostList[i][1:]
+            break
+
+    return costList
+
+
+# helper to convert a Gene letter to it's corresponding array index
+def letterToIdx(x):
+    letters = {
+        '-': 0,
+        'A': 1,
+        'T': 2,
+        'G': 3,
+        'C': 4
+    }
+
+    return letters.get(x)
+
+
+# Function to get the cost of aligning letters a and b. Uses costList
+# returned by costToFileList().
+def cost(costList, a, b):
+    if a == b:
+        return 0
+    else:
+        c = letterToIdx(b)
+        if c is not None:
+            return costList[a][c]
+    return None
+
+
+
+# def getSeq(listOfPairs[n], int seq)
+# This function takes a dict object from listOfPairs and a number indicating
 # which sequence is wanted, the first or second.
 def getSeq(dic, num):
     if num == 1:
