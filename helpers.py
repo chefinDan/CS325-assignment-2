@@ -1,5 +1,6 @@
-# Function to return the minimum value of three numbers
 
+
+# Function to return the minimum value of three numbers
 def min(num1, num2, num3):
 
     if num1 <= num2 and num1 <= num3:
@@ -66,7 +67,7 @@ def letterToIdx(x):
 
 
 # Function to get the cost of aligning letters a and b. Uses costList
-# returned by costToFileList().
+# returned by costFileToList().
 def cost(costList, a, b):
     if a == b:
         return 0
@@ -75,16 +76,3 @@ def cost(costList, a, b):
         if c is not None:
             return costList[a][c]
     return None
-
-
-
-# def getSeq(listOfPairs[n], int seq)
-# This function takes a dict object from listOfPairs and a number indicating
-# which sequence is wanted, the first or second.
-def getSeq(dic, num):
-    if num == 1:
-        return dic['seqA']
-    elif num == 2:
-        return dic['seqB']
-    else:
-        return None
