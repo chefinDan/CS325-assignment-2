@@ -12,9 +12,9 @@
 # returns a list of dicts. Each element of the list has the
 # following format:
 #
-# List[0] = {
-#    'seqA': AGTCGGTACGCT...
-#    'seqB': TCAGGTTAACAC...
+# List[0] = [
+#    [AGTCGGTACGCT...]
+#    [TCAGGTTAACAC...]
 # }
 
 
@@ -31,9 +31,8 @@ def seqFileToList(filename):
             for l in rawline.split(','):
                 tmp.append(l.strip('\n'))
 
-            # append a dict object to main gene sequence list, assigning each sequence
-            # the name seqA or seqB
-            listOfPairs.append({'seqA': tmp[0], 'seqB': tmp[1]})
+            # append a list object to main gene sequence list
+            listOfPairs.append([tmp[0], tmp[1]])
 
     return listOfPairs
 
@@ -96,10 +95,12 @@ def letterToIdx(x):
 # ************* Example usage **********************************
 seqfile = 'imp2input.txt'
 seqlist = seqFileToList(seqfile)
-print seqlist
+seqA = seqlist[0][0]
+seqB = seqlist[0][1]
+print "SeqA: {}\nSeqB: {}\n".format(seqA, seqB)
 
 costfile = 'imp2cost.txt'
-costlist = costFileToList(costfile)
+costlist = costFileToList(costfile)  # only use costlist via functions
 cost1 = cost(costlist, 'A', 'G')
 cost2 = cost(costlist, '-', 'T')
 cost3 = cost(costlist, 'C', 'T')
