@@ -75,7 +75,7 @@ def cost(costList, a, b):
         c = letterToIdx(a)
         d = letterToIdx(b)
         if c is not None and d is not None:
-            return costList[c][d]
+            return int(costList[c][d])
     return None
 
 
@@ -93,18 +93,4 @@ def letterToIdx(x):
 
 
 # ************* Example usage **********************************
-seqfile = 'imp2input.txt'
-seqlist = seqFileToList(seqfile)
-seqA = seqlist[0][0]
-seqB = seqlist[0][1]
-print "SeqA: {}\nSeqB: {}\n".format(seqA, seqB)
 
-costfile = 'imp2cost.txt'
-costlist = costFileToList(costfile)  # only use costlist via functions
-cost1 = cost(costlist, 'A', 'G')
-cost2 = cost(costlist, '-', 'T')
-cost3 = cost(costlist, 'C', 'T')
-
-min = min(cost1, cost2, cost3)
-
-print min
