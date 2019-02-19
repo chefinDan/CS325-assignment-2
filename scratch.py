@@ -1,4 +1,5 @@
 import helpers
+import sys
 
 
 seqfile = 'imp2input.txt'
@@ -15,7 +16,7 @@ lenB = len(seqlist[0][1])
 E = list()
 for i in range(0, lenA):
     E.append(list())
-    print "seqA[{}]: {}".format(i, seqA[i])
+    # print "seqA[{}]: {}".format(i, seqA[i])
     E[i].append(helpers.cost(costlist, seqA[i], seqB[0]))
 
 for j in range(1, lenB):
@@ -28,4 +29,9 @@ for i in range(1, lenA):
 
 
 for i in E:
-    print i
+    for j in i:
+        if j/10 < 1:
+            sys.stdout.write("{} ".format(j))
+        else:
+            sys.stdout.write("{}".format(j))
+    print "\n"
