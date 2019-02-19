@@ -75,7 +75,7 @@ def cost(costList, a, b):
         c = letterToIdx(a)
         d = letterToIdx(b)
         if c is not None and d is not None:
-            return costList[c][d]
+            return int(costList[c][d])
     return None
 
 
@@ -92,19 +92,56 @@ def letterToIdx(x):
     return letters.get(x)
 
 
+def costMatrixGen(costlist, word1, word2):
+    E = []
+    for i in range(0,len(word1)):
+        E.append([])
+        for j in range(0,len(word2)):
+            # Base case i == 0 or j == 0
+            if(i == 0 and j == 0):
+                # base case: doesn't use E
+                choose_both = cost(costlist, word1[i], word2[j])
+                edit_i      = cost(costlist, word1[i], '-'       )
+                edit_j      = cost(costlist, '-'       , word2[j])
+                minval = min(choose_both, edit_i, edit_j)
+                E[i].append(minval)
+            elif(i == 0):
+                # j must be a '-'
+                minval = cost(costlist, word1[i], '-') + E[i][j-1]
+                E[i].append(minval)
+            elif(j == 0):
+                # i must be a '-'
+                minval = cost(costlist, '-', word2[j]) + E[i-1][j]
+                E[i].append(minval)
+            else:
+                # three options: j is an edit, i is an edit, or i and j paired are least cost
+                choose_both = cost(costlist, word1[i], word2[j]) + E[i-1][j-1]
+                edit_i      = cost(costlist, word1[i], '-'       ) + E[i-1][j]
+                edit_j      = cost(costlist, '-'       , word2[j]) + E[i][j-1]
+                minval = min(choose_both, edit_i, edit_j)
+                E[i].append(minval)
+    print(E)
+
+
 # ************* Example usage **********************************
-seqfile = 'imp2input.txt'
-seqlist = seqFileToList(seqfile)
-seqA = seqlist[0][0]
-seqB = seqlist[0][1]
-print "SeqA: {}\nSeqB: {}\n".format(seqA, seqB)
+def main():
+    seqfile = 'imp2input.txt'
+    seqlist = seqFileToList(seqfile)
+    seqA = seqlist[0][0]
+    seqB = seqlist[0][1]
+    print "SeqA: {}\nSeqB: {}\n".format(seqA, seqB)
 
-costfile = 'imp2cost.txt'
-costlist = costFileToList(costfile)  # only use costlist via functions
-cost1 = cost(costlist, 'A', 'G')
-cost2 = cost(costlist, '-', 'T')
-cost3 = cost(costlist, 'C', 'T')
+    costfile = 'ex_cost.txt'             # ex_cost.txt simulates the assignment example
+    costlist = costFileToList(costfile)  # only use costlist via functions
+    cost1 = cost(costlist, 'A', 'G')
+    cost2 = cost(costlist, '-', 'T')
+    cost3 = cost(costlist, 'C', 'T')
 
-min = min(cost1, cost2, cost3)
+    minval = min(cost1, cost2, cost3)
 
-print min
+    costMatrixGen(costlist, 'AAAAAAA', 'AAAAAA')
+    print min
+
+## Header guard so main is not executed when helpers is included
+if __name__ == '__main__':
+    main()
