@@ -1,4 +1,4 @@
-
+import sys
 
 # *********************************************************
 # Example usage of the functions can be found at the bottom
@@ -90,6 +90,29 @@ def letterToIdx(x):
     }
 
     return letters.get(x)
+
+
+def printMatrix(E, seqA, seqB):
+    sys.stdout.write('    ')
+
+    for i in range(0, len(seqB)):
+        sys.stdout.write('{0: <3}'.format(seqB[i]))
+    sys.stdout.write('\n')
+    sys.stdout.write('   ')
+
+    for i in range(0, len(seqB)):
+        sys.stdout.write("{}".format('---'))
+    sys.stdout.write('\n')
+
+    for i in range(0, len(seqA)):
+        sys.stdout.write(" {}| ".format(seqA[i]))
+        for j in range(0, len(seqB)):
+            if E[i][j]/10 < 1:
+                sys.stdout.write("{}  ".format(E[i][j]))
+            else:
+                sys.stdout.write("{} ".format(E[i][j]))
+        sys.stdout.write("\n")
+
 
 
 # ************* Example usage **********************************
