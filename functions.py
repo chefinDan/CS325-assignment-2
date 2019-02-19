@@ -92,7 +92,48 @@ def letterToIdx(x):
     return letters.get(x)
 
 
+def makeAlignMatrix(costlist, Aseq, Bseq):
+    # declare the alignment matrix E to be a python list
+    E = list()
+
+    # add a blank ('-') character to the beggining of each sequence,
+    # save the length of each sequence to a variable
+    seqA = '-' + Aseq
+    seqB = '-' + Bseq
+    lenA = len(seqA)
+    lenB = len(seqB)
+
+    # calculate the cost for the first column, where seqB[0] = '-'
+    for i in range(0, lenA):
+        E.append(list())  # each iteration adds a new row to column 0
+        if i == 0:  # the very first element, has no previous element
+            E[i].append(cost(costlist, seqA[i], '-'))
+        else:
+            # the current row gets the cost of the previous row plus the cost
+            # of aligning the current letter with '-'
+            E[i].append(E[i-1][0] + cost(costlist, seqA[i], '-'))
+
+    # calculate the cost for the first row, where seqA[0] = '-'
+    for j in range(1, lenB):  # start at 1, 0'th element is already calculated
+        # Each element of the first row gets the cost of the previous element
+        # plus the cost of aligning with '-'
+        E[0].append(E[0][j-1] + cost(costlist, '-', seqB[j]))
+
+    # calculate the cost for the rest of the matrix
+    for i in range(1, lenA):
+        for j in range(1, lenB):
+            use_j = E[i-1][j] + cost(costlist, seqA[i], '-')
+            use_i = E[i][j-1] + cost(costlist, '-', seqB[j])
+            use_both = E[i-1][j-1] + cost(costlist, seqA[i], seqB[j])
+            E[i].append(min(use_j, use_i, use_both))
+
+    return E
+
+
 def printMatrix(E, seqA, seqB):
+    seqA = '-' + seqA
+    seqB = '-' + seqB
+
     sys.stdout.write('    ')
 
     for i in range(0, len(seqB)):

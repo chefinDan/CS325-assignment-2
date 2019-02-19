@@ -1,39 +1,24 @@
-import helpers
-import sys
+import functions as fn
 
-
+# enter the name of the input data file
 seqfile = 'imp2input.txt'
-seqlist = helpers.seqFileToList(seqfile)
 
+# creates a 2-D python list of the entire input file
+# ex: seqlist[2][0] is the first sequence of the 3rd pair of sequences.
+seqlist = fn.seqFileToList(seqfile)
+seqA = seqlist[0][0]
+seqB = seqlist[0][1]
+
+# enter the name of the cost data file
 costfile = 'imp2cost.txt'
-costlist = helpers.costFileToList(costfile)
+# creates a 2-D python list of the cost table
+costlist = fn.costFileToList(costfile)
 
-seqA = '-' + seqlist[2][0]
-seqB = '-' + seqlist[2][1]
-lenA = len(seqA)
-lenB = len(seqB)
+# makeAlignMatrix() returns a 2-D python list
+E = fn.makeAlignMatrix(costlist, seqA, seqB)
 
-E = list()
+# print the final matrix, used for algorithm correctness confirmation
+fn.printMatrix(E, seqA, seqB)
 
-# calculate the cost for the first column, where seqB[0] = '-'
-for i in range(0, lenA):
-    E.append(list())
-    if i == 0:
-        E[i].append(helpers.cost(costlist, seqA[i], '-'))
-    else:
-        E[i].append(E[i-1][0] + helpers.cost(costlist, seqA[i], '-'))
-
-# calculate the cost for the first row, where seqA[0] = '-'
-for j in range(1, lenB):
-        E[0].append(E[0][j-1] + helpers.cost(costlist, '-', seqB[j]))
-
-
-# calculate the cost for the rest of the matrix
-for i in range(1, lenA):
-    for j in range(1, lenB):
-        E[i].append( min(E[i-1][j] + helpers.cost(costlist, seqA[i], '-'),
-                         E[i][j-1] + helpers.cost(costlist, '-', seqB[j]),
-                         E[i-1][j-1] + helpers.cost(costlist, seqA[i], seqB[j])))
-
-# print the final matrix, used for algo correctness confirmation
-helpers.printMatrix(E, seqA, seqB)
+# the optimal alignment cost is the bottom right element in the matrix
+print 'Optimal Alignment Cost: {}'.format(E[len(seqA)][len(seqB)])
