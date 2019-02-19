@@ -1,4 +1,4 @@
-
+import sys
 
 # *********************************************************
 # Example usage of the functions can be found at the bottom
@@ -75,7 +75,7 @@ def cost(costList, a, b):
         c = letterToIdx(a)
         d = letterToIdx(b)
         if c is not None and d is not None:
-            return costList[c][d]
+            return int(costList[c][d])
     return None
 
 
@@ -92,19 +92,83 @@ def letterToIdx(x):
     return letters.get(x)
 
 
+def makeAlignMatrix(costlist, Aseq, Bseq):
+    # declare the alignment matrix E to be a python list
+    E = list()
+
+    # add a blank ('-') character to the beggining of each sequence,
+    # save the length of each sequence to a variable
+    seqA = '-' + Aseq
+    seqB = '-' + Bseq
+    lenA = len(seqA)
+    lenB = len(seqB)
+
+    # calculate the cost for the first column, where seqB[0] = '-'
+    for i in range(0, lenA):
+        E.append(list())  # each iteration adds a new row to column 0
+        if i == 0:  # the very first element, has no previous element
+            E[i].append(cost(costlist, seqA[i], '-'))
+        else:
+            # the current row gets the cost of the previous row plus the cost
+            # of aligning the current letter with '-'
+            E[i].append(E[i-1][0] + cost(costlist, seqA[i], '-'))
+
+    # calculate the cost for the first row, where seqA[0] = '-'
+    for j in range(1, lenB):  # start at 1, 0'th element is already calculated
+        # Each element of the first row gets the cost of the previous element
+        # plus the cost of aligning with '-'
+        E[0].append(E[0][j-1] + cost(costlist, '-', seqB[j]))
+
+    # calculate the cost for the rest of the matrix
+    for i in range(1, lenA):
+        for j in range(1, lenB):
+            use_j = E[i-1][j] + cost(costlist, seqA[i], '-')
+            use_i = E[i][j-1] + cost(costlist, '-', seqB[j])
+            use_both = E[i-1][j-1] + cost(costlist, seqA[i], seqB[j])
+            E[i].append(min(use_j, use_i, use_both))
+
+    return E
+
+
+def printMatrix(E, seqA, seqB):
+    seqA = '-' + seqA
+    seqB = '-' + seqB
+
+    sys.stdout.write('    ')
+
+    for i in range(0, len(seqB)):
+        sys.stdout.write('{0: <3}'.format(seqB[i]))
+    sys.stdout.write('\n')
+    sys.stdout.write('   ')
+
+    for i in range(0, len(seqB)):
+        sys.stdout.write("{}".format('---'))
+    sys.stdout.write('\n')
+
+    for i in range(0, len(seqA)):
+        sys.stdout.write(" {}| ".format(seqA[i]))
+        for j in range(0, len(seqB)):
+            if E[i][j]/10 < 1:
+                sys.stdout.write("{}  ".format(E[i][j]))
+            else:
+                sys.stdout.write("{} ".format(E[i][j]))
+        sys.stdout.write("\n")
+
+
+
 # ************* Example usage **********************************
-seqfile = 'imp2input.txt'
-seqlist = seqFileToList(seqfile)
-seqA = seqlist[0][0]
-seqB = seqlist[0][1]
-print "SeqA: {}\nSeqB: {}\n".format(seqA, seqB)
-
-costfile = 'imp2cost.txt'
-costlist = costFileToList(costfile)  # only use costlist via functions
-cost1 = cost(costlist, 'A', 'G')
-cost2 = cost(costlist, '-', 'T')
-cost3 = cost(costlist, 'C', 'T')
-
-min = min(cost1, cost2, cost3)
-
-print min
+# seqfile = 'imp2input.txt'
+# seqlist = seqFileToList(seqfile)
+# seqA = seqlist[0][0]
+# seqB = seqlist[0][1]
+# print "SeqA: {}\nSeqB: {}\n".format(seqA, seqB)
+#
+# costfile = 'imp2cost.txt'
+# costlist = costFileToList(costfile)  # only use costlist via functions
+# cost1 = cost(costlist, 'A', 'G')
+# cost2 = cost(costlist, '-', 'T')
+# cost3 = cost(costlist, 'C', 'T')
+#
+# min = min(cost1, cost2, cost3)
+#
+# print min
