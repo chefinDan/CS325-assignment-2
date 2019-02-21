@@ -17,6 +17,22 @@
 #    [TCAGGTTAACAC...]
 # }
 
+import random
+
+def genTestFiles():
+    sizes = [500,1000,2000,4000,5000]
+    letters = ['A','C','T','G']
+    for size in sizes:
+        filename = "test_" + str(size) + ".txt"
+        with open(filename, "w") as fp:
+            for i in range(0,10):
+                for j in range(0,size):
+                    fp.write(random.choice(letters))
+                fp.write(',')
+                for j in range(0,size):
+                    fp.write(random.choice(letters))
+                fp.write('\n')
+
 
 def seqFileToList(filename):
     # list structure to store gene sequence data of the entire file
@@ -93,18 +109,22 @@ def letterToIdx(x):
 
 
 # ************* Example usage **********************************
-seqfile = 'imp2input.txt'
-seqlist = seqFileToList(seqfile)
-seqA = seqlist[0][0]
-seqB = seqlist[0][1]
-print "SeqA: {}\nSeqB: {}\n".format(seqA, seqB)
+def main():
+    seqfile = 'imp2input.txt'
+    seqlist = seqFileToList(seqfile)
+    seqA = seqlist[0][0]
+    seqB = seqlist[0][1]
+    print "SeqA: {}\nSeqB: {}\n".format(seqA, seqB)
 
-costfile = 'imp2cost.txt'
-costlist = costFileToList(costfile)  # only use costlist via functions
-cost1 = cost(costlist, 'A', 'G')
-cost2 = cost(costlist, '-', 'T')
-cost3 = cost(costlist, 'C', 'T')
+    costfile = 'imp2cost.txt'
+    costlist = costFileToList(costfile)  # only use costlist via functions
+    cost1 = cost(costlist, 'A', 'G')
+    cost2 = cost(costlist, '-', 'T')
+    cost3 = cost(costlist, 'C', 'T')
 
-min = min(cost1, cost2, cost3)
+    min = min(cost1, cost2, cost3)
 
-print min
+    print min
+
+if __name__ == "__main__":
+    main()
