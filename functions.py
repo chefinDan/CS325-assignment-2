@@ -165,31 +165,31 @@ def backTrace(E, SeqA, SeqB):
 	traceList = []
 	minCost = E[yLength][xLength]
 	while(not(xLength == 0 and yLength == 0)):
-		cost = E[yLength][xLength]
-		aboveCost = E[yLength -1][xLength]
+		cost = E[yLength][xLength]								#initialize cost variables
+		aboveCost = E[yLength -1][xLength]					
 		leftCost = E[yLength][xLength-1]
 		diagCost = E[yLength-1][xLength-1]
 		print cost
-		if (yLength != 0 and diagCost < cost and diagCost <= leftCost and diagCost <= aboveCost):
+		if (yLength != 0 and diagCost < cost and diagCost <= leftCost and diagCost <= aboveCost): # if diagonal is the lowest, prioritizes diagonal
 			xLength, yLength = xLength-1, yLength - 1
 			print "diagnonal"
 			trace = trace + 1
 			traceList.append('d')			
-		elif (xLength != 0 and leftCost < cost and leftCost < aboveCost):
+		elif (xLength != 0 and leftCost < cost and leftCost < aboveCost):			# else if the left is smaller and smaller than above cost
 			xLength, yLength = xLength-1, yLength
 			print "left"
 			trace = trace + 1
 			traceList.append('l')
-		elif (yLength != 0 and aboveCost < cost):
+		elif (yLength != 0 and aboveCost < cost):									# else above cost is lowest
 			xLength, yLength = xLength, yLength-1
 			print "above"
 			trace = trace + 1
 			traceList.append('u')
-		elif  (xLength != 0 and yLength != 0 and diagCost == cost):
+		elif  (xLength != 0 and yLength != 0 and diagCost == cost):					# check if diagonal is equal to cost
 			xLength, yLength = xLength-1, yLength-1
 			print "diagnonal"
 			trace = trace + 1
-			traceList.append('=')
+			traceList.append('=')			
 				
 			
 	print traceList
@@ -207,17 +207,17 @@ def edit_string(path, pathLength, seqA, seqB):
 	# edit string A and B
 	
 	while lenA > 0 and lenB > 0:
-		for i in range(0, pathLength):
-			if path[i] == 'd' or path[i] == '=':
+		for i in range(0, pathLength):					# go through trace list
+			if path[i] == 'd' or path[i] == '=':		# if diagonal do nothing
 				editA += seqA[lenA]
 				editB += seqB[lenB]
 				lenA -= 1
 				lenB -= 1
-			elif path[i] == 'l':
+			elif path[i] == 'l':						# if left then add space to first string (column string)
 				editA += "-"
 				editB += seqB[lenB]
 				lenB -= 1
-			elif path[i] == 'u':
+			elif path[i] == 'u':						# if up then add space to second string	(row string)
 				editA += seqA[lenA]
 				editB += "-"
 				lenA -= 1
