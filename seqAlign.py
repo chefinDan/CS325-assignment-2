@@ -6,14 +6,14 @@ seqfile = 'imp2input.txt'
 # creates a 2-D python list of the entire input file
 # ex: seqlist[2][0] is the first sequence of the 3rd pair of sequences.
 seqlist = fn.seqFileToList(seqfile)
-seqA = seqlist[0][0]
-seqB = seqlist[0][1]
+#seqA = seqlist[0][0]
+#seqB = seqlist[0][1]
 
 #seqA = "ATCC"
 #seqB = "TCAC"
 
-#seqA = "TCACCAA"
-#seqB = "GGTTACCA"
+seqA = "TACG"
+seqB = "TGG"
 # enter the name of the cost data file
 costfile = 'imp2cost.txt'
 # creates a 2-D python list of the cost table

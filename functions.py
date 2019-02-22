@@ -205,7 +205,7 @@ def edit_string(path, pathLength, seqA, seqB):
 	lenA = len(seqA)
 	editA = []					# new edited string
 	# edit string A
-	while lenA - 1 > 0:
+	while lenA > 0:
 		for i in range(0, pathLength):
 			if path[i] == 'd': 				# if it is diagnonal and not equal to the previous cost add a space
 				#print "align", editA
@@ -230,7 +230,7 @@ def edit_string(path, pathLength, seqA, seqB):
 				editA.append(seqA[lenA])
 				#print "deletion", editA
 	# edit string B
-	while lenB - 1 > 0:
+	while lenB > 0:
 		for i in range(0, pathLength):
 			if path[i] == 'd':				# if it is diagnonal and not equal to the previous cost add a space 
 				#print "align"
