@@ -200,54 +200,28 @@ def backTrace(E, SeqA, SeqB):
 	return list1, list2, minCost
 	
 def edit_string(path, pathLength, seqA, seqB):
-	lenB = len(seqB)
-	editB = []					# new edited string
-	lenA = len(seqA)
-	editA = []					# new edited string
-	# edit string A
-	while lenA > 0:
+	lenB = len(seqB) - 1
+	editB = ""					# new edited string
+	lenA = len(seqA) - 1
+	editA = ""					# new edited string
+	# edit string A and B
+	
+	while lenA > 0 and lenB > 0:
 		for i in range(0, pathLength):
-			if path[i] == 'd': 				# if it is diagnonal and not equal to the previous cost add a space
-				#print "align", editA
-				lenA = lenA -1
-				editA.append(seqA[lenA])
-				editA.append('-')
-				
-				#print "after align", editA
-			elif path[i] == '=':			# if the cost is the same do nothing
-				#print "align", editA
-				lenA = lenA -1
-				#print lenA, seqA[lenA]
-				editA.append(seqA[lenA])
-				#print "after align", editA
-			elif path[i] == 'l':			# if the trace went left add a space to first string
-				#print "insert", editA
-				editA.append('-')
-				#print "after", editA
-			elif path[i] == 'u':			# if trace went up, do nothing
-				#print "deletion", editA
-				lenA = lenA -1
-				editA.append(seqA[lenA])
-				#print "deletion", editA
-	# edit string B
-	while lenB > 0:
-		for i in range(0, pathLength):
-			if path[i] == 'd':				# if it is diagnonal and not equal to the previous cost add a space 
-				#print "align"
-				lenB = lenB -1
-				editB.append('-')
-				editB.append(seqB[lenB])
-			elif path[i] == '=':			# if the cost is the same do nothing
-				#print "align"
-				lenB = lenB -1
-				editB.append(seqB[lenB])
-			elif path[i] == 'l':			# if the trace went left do nothing
-				#print "insert"
-				lenB = lenB -1
-				editB.append(seqB[lenB])
-			elif path[i] == 'u':			# if the trace went up add a space
-				#print "deletion"
-				editB.append('-')
+			if path[i] == 'd' or path[i] == '=':
+				editA += seqA[lenA]
+				editB += seqB[lenB]
+				lenA -= 1
+				lenB -= 1
+			elif path[i] == 'l':
+				editA += "-"
+				editB += seqB[lenB]
+				lenB -= 1
+			elif path[i] == 'u':
+				editA += seqA[lenA]
+				editB += "-"
+				lenA -= 1
+	
 	return editA[::-1], editB[::-1]			# strings are in reverse so I reversed to normal here
 	
 
