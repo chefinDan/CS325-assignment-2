@@ -157,12 +157,13 @@ def printMatrix(E, seqA, seqB):
 def backTrace(E, SeqA, SeqB):
 	lenght1 = len(SeqA)
 	lenght2 = len(SeqB)
-	xLength = len(E[0]) - 1
-	yLength = len(E) - 1
+	xLength = len(E[0]) - 1				#rows
+	yLength = len(E) - 1				#columns
 	print xLength
 	print yLength
 	trace = 0
 	traceList = []
+	minCost = E[yLength][xLength]
 	while(not(xLength == 0 and yLength == 0)):
 		cost = E[yLength][xLength]
 		aboveCost = E[yLength -1][xLength]
@@ -174,7 +175,7 @@ def backTrace(E, SeqA, SeqB):
 			print "diagnonal"
 			trace = trace + 1
 			traceList.append('d')			
-		elif (xLength != 0 and yLength != 0 and leftCost < cost):
+		elif (xLength != 0 and leftCost < cost and leftCost < aboveCost):
 			xLength, yLength = xLength-1, yLength
 			print "left"
 			trace = trace + 1
@@ -192,23 +193,62 @@ def backTrace(E, SeqA, SeqB):
 				
 			
 	print traceList
-	print trace
-	edit_string(traceList, trace, SeqA, SeqB)
-	
-	return
+	print SeqA, SeqB
+	list1, list2 = edit_string(traceList, trace, SeqA, SeqB)
+	print list1
+	print list2
+	return list1, list2, minCost
 	
 def edit_string(path, pathLength, seqA, seqB):
-	for i in range(0, pathLength):
-		if path[i] == 'd':
-			print "align"
-		elif path[i] == '=':
-			print "align"
-		elif path[i] == 'l':
-			print "insert"
-		elif path[i] == 'u':
-			print "deletion"
-		
-	return
+	lenB = len(seqB)
+	editB = []					# new edited string
+	lenA = len(seqA)
+	editA = []					# new edited string
+	# edit string A
+	while lenA - 1 > 0:
+		for i in range(0, pathLength):
+			if path[i] == 'd': 				# if it is diagnonal and not equal to the previous cost add a space
+				#print "align", editA
+				lenA = lenA -1
+				editA.append(seqA[lenA])
+				editA.append('-')
+				
+				#print "after align", editA
+			elif path[i] == '=':			# if the cost is the same do nothing
+				#print "align", editA
+				lenA = lenA -1
+				#print lenA, seqA[lenA]
+				editA.append(seqA[lenA])
+				#print "after align", editA
+			elif path[i] == 'l':			# if the trace went left add a space to first string
+				#print "insert", editA
+				editA.append('-')
+				#print "after", editA
+			elif path[i] == 'u':			# if trace went up, do nothing
+				#print "deletion", editA
+				lenA = lenA -1
+				editA.append(seqA[lenA])
+				#print "deletion", editA
+	# edit string B
+	while lenB - 1 > 0:
+		for i in range(0, pathLength):
+			if path[i] == 'd':				# if it is diagnonal and not equal to the previous cost add a space 
+				#print "align"
+				lenB = lenB -1
+				editB.append('-')
+				editB.append(seqB[lenB])
+			elif path[i] == '=':			# if the cost is the same do nothing
+				#print "align"
+				lenB = lenB -1
+				editB.append(seqB[lenB])
+			elif path[i] == 'l':			# if the trace went left do nothing
+				#print "insert"
+				lenB = lenB -1
+				editB.append(seqB[lenB])
+			elif path[i] == 'u':			# if the trace went up add a space
+				#print "deletion"
+				editB.append('-')
+	return editA[::-1], editB[::-1]			# strings are in reverse so I reversed to normal here
 	
 
 # ************* Example usage **********************************
