@@ -93,40 +93,60 @@ def letterToIdx(x):
 
 def makeAlignMatrix(costlist, Aseq, Bseq):
     # declare the alignment matrix E to be a python list
-    E = list()
-
+	E = list()
+	minTrace = []
     # add a blank ('-') character to the beggining of each sequence,
     # save the length of each sequence to a variable
-    seqA = '-' + Aseq
-    seqB = '-' + Bseq
-    lenA = len(seqA)
-    lenB = len(seqB)
-
+	seqA = '-' + Aseq
+	seqB = '-' + Bseq
+	lenA = len(seqA)
+	lenB = len(seqB)
     # calculate the cost for the first column, where seqB[0] = '-'
-    for i in range(0, lenA):
-        E.append(list())  # each iteration adds a new row to column 0
-        if i == 0:  # the very first element, has no previous element
-            E[i].append(cost(costlist, seqA[i], '-'))
-        else:
-            # the current row gets the cost of the previous row plus the cost
-            # of aligning the current letter with '-'
-            E[i].append(E[i-1][0] + cost(costlist, seqA[i], '-'))
+	for i in range(0, lenA):
+		E.append(list())  # each iteration adds a new row to column 0
+		if i == 0:  # the very first element, has no previous element
+			E[i].append(cost(costlist, seqA[i], '-'))
+		else:
+			# the current row gets the cost of the previous row plus the cost
+			# of aligning the current letter with '-'
+			E[i].append(E[i-1][0] + cost(costlist, seqA[i], '-'))
 
-    # calculate the cost for the first row, where seqA[0] = '-'
-    for j in range(1, lenB):  # start at 1, 0'th element is already calculated
-        # Each element of the first row gets the cost of the previous element
-        # plus the cost of aligning with '-'
-        E[0].append(E[0][j-1] + cost(costlist, '-', seqB[j]))
+	# calculate the cost for the first row, where seqA[0] = '-'
+	for j in range(1, lenB):  # start at 1, 0'th element is already calculated
+		# Each element of the first row gets the cost of the previous element
+		# plus the cost of aligning with '-'
+		E[0].append(E[0][j-1] + cost(costlist, '-', seqB[j]))
+	# calculate the cost for the rest of the matrix
+	for i in range(1, lenA):
+		for j in range(1, lenB):
+			cell = []
+			use_j = E[i-1][j] + cost(costlist, seqA[i], '-')
+			use_i = E[i][j-1] + cost(costlist, '-', seqB[j])
+			use_both = E[i-1][j-1] + cost(costlist, seqA[i], seqB[j])
+			E[i].append(min(use_j, use_i, use_both))
+			mincost = E[i][j]
+			if mincost == use_j and mincost == use_i and mincost == use_both:
+				cell.append('daig')
+				cell.append('left')
+				cell.append('up')
+			elif mincost == use_j and mincost == use_i:
+				cell.append('left')
+				cell.append('up')
+			elif mincost == use_j and mincost == use_both:
+				cell.append('daig')
+				cell.append('left')	
+			elif mincost == use_i and mincost == use_both:
+				cell.append('daig')
+				cell.append('up')			
+			elif mincost == use_j:
+				cell.append('left')
+			elif mincost == use_i:
+				cell.append('up')
+			elif mincost == use_both:
+				cell.append('diag')
+		minTrace.append(cell)
 
-    # calculate the cost for the rest of the matrix
-    for i in range(1, lenA):
-        for j in range(1, lenB):
-            use_j = E[i-1][j] + cost(costlist, seqA[i], '-')
-            use_i = E[i][j-1] + cost(costlist, '-', seqB[j])
-            use_both = E[i-1][j-1] + cost(costlist, seqA[i], seqB[j])
-            E[i].append(min(use_j, use_i, use_both))
-
-    return E
+	return E, minTrace
 
 
 def printMatrix(E, seqA, seqB):
@@ -134,7 +154,7 @@ def printMatrix(E, seqA, seqB):
     seqB = '-' + seqB
 
     sys.stdout.write('    ')
-
+	
     for i in range(0, len(seqB)):
         sys.stdout.write('{0: <3}'.format(seqB[i]))
     sys.stdout.write('\n')
@@ -153,50 +173,53 @@ def printMatrix(E, seqA, seqB):
                 sys.stdout.write("{} ".format(E[i][j]))
         sys.stdout.write("\n")
 
-def backTrace(E, SeqA, SeqB):
+def backTrace(E, SeqA, SeqB, minTrace):
 	lenght1 = len(SeqA)
 	lenght2 = len(SeqB)
 	xLength = len(E[0]) - 1				#rows
 	yLength = len(E) - 1				#columns
-	print xLength
-	print yLength
 	trace = 0
 	traceList = []
+	for i in range(0, len(minTrace)):
+		print i, minTrace[i]
+		print "\n"
 	minCost = E[yLength][xLength]								# min edit distance
-	while(not(xLength == 0 and yLength == 0)):
-		cost = E[yLength][xLength]								#initialize cost variables
-		aboveCost = E[yLength -1][xLength]					
-		leftCost = E[yLength][xLength-1]
-		diagCost = E[yLength-1][xLength-1]
-		print cost
-		if (yLength != 0 and diagCost < cost and diagCost <= leftCost and diagCost <= aboveCost): # if diagonal is the lowest, prioritizes diagonal
-			xLength, yLength = xLength-1, yLength - 1
-			print "diagnonal"
-			trace = trace + 1
-			traceList.append('d')			
-		elif (xLength != 0 and leftCost < cost and leftCost < aboveCost):			# else if the left is smaller and smaller than above cost
-			xLength, yLength = xLength-1, yLength
-			print "left"
-			trace = trace + 1
-			traceList.append('l')
-		elif (yLength != 0 and aboveCost < cost):									# else above cost is lowest
-			xLength, yLength = xLength, yLength-1
-			print "above"
-			trace = trace + 1
-			traceList.append('u')
-		elif  (xLength != 0 and yLength != 0 and diagCost == cost):					# check if diagonal is equal to cost
-			xLength, yLength = xLength-1, yLength-1
-			print "diagnonal"
-			trace = trace + 1
-			traceList.append('=')			
+	
+	#while(not(xLength == 0 and yLength == 0)):
+	#	cost = E[yLength][xLength]								#initialize cost variables
+	#	aboveCost = E[yLength -1][xLength]					
+	#	leftCost = E[yLength][xLength-1]
+	#	diagCost = E[yLength-1][xLength-1]
+	#	#print cost
+	#	if (yLength != 0 and xLength != 0 and diagCost < cost and diagCost <= leftCost and diagCost <= aboveCost): # if diagonal is the lowest, prioritizes diagonal
+	#		xLength, yLength = xLength-1, yLength - 1
+	#		#print "diagnonal"
+	#		trace = trace + 1
+	#		traceList.append('d')			
+	#	elif (xLength != 0 and leftCost < cost and leftCost < aboveCost):			# else if the left is smaller and smaller than above cost
+	#		xLength, yLength = xLength-1, yLength
+		#	print "left"
+	#		trace = trace + 1
+	#		traceList.append('l')
+	#	elif (yLength != 0 and aboveCost < cost):									# else above cost is lowest
+	#		xLength, yLength = xLength, yLength-1
+	#	#	print "above"
+	#		trace = trace + 1
+	#		traceList.append('u')
+	#	elif  (xLength != 0 and yLength != 0 and diagCost == cost):					# check if diagonal is equal to cost
+	#		xLength, yLength = xLength-1, yLength-1
+		#	print "diagnonal"
+	#		trace = trace + 1
+	#		traceList.append('=')			
 				
 			
 	print traceList
 	print SeqA, SeqB
-	list1, list2 = edit_string(traceList, trace, SeqA, SeqB)
-	print list1
-	print list2
-	return list1, list2, minCost
+	print "trace length", trace
+	#list1, list2 = edit_string(traceList, trace, SeqA, SeqB)
+	#print list1
+	#print list2
+	return #list1, list2, minCost
 	
 def edit_string(path, pathLength, seqA, seqB):
 	lenB = len(seqB) - 1
@@ -204,7 +227,6 @@ def edit_string(path, pathLength, seqA, seqB):
 	lenA = len(seqA) - 1
 	editA = ""					# new edited string
 	# edit string A and B
-	print pathLength
 	while lenA > 0 and lenB > 0:
 		for i in range(0, pathLength):					# go through trace list
 			if path[i] == 'd' or path[i] == '=':		# if diagonal do nothing
