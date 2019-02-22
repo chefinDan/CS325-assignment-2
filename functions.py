@@ -163,7 +163,7 @@ def backTrace(E, SeqA, SeqB):
 	print yLength
 	trace = 0
 	traceList = []
-	minCost = E[yLength][xLength]
+	minCost = E[yLength][xLength]								# min edit distance
 	while(not(xLength == 0 and yLength == 0)):
 		cost = E[yLength][xLength]								#initialize cost variables
 		aboveCost = E[yLength -1][xLength]					
@@ -205,7 +205,7 @@ def edit_string(path, pathLength, seqA, seqB):
 	lenA = len(seqA) - 1
 	editA = ""					# new edited string
 	# edit string A and B
-	
+	print pathLength
 	while lenA > 0 and lenB > 0:
 		for i in range(0, pathLength):					# go through trace list
 			if path[i] == 'd' or path[i] == '=':		# if diagonal do nothing
