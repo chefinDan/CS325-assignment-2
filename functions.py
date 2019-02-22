@@ -111,13 +111,15 @@ def letterToIdx(x):
 def makeAlignMatrix(costlist, Aseq, Bseq):
     # declare the alignment matrix E to be a python list
     E = list()
-
+    directions = []
     # add a blank ('-') character to the beggining of each sequence,
     # save the length of each sequence to a variable
     seqA = '-' + Aseq
     seqB = '-' + Bseq
     lenA = len(seqA)
     lenB = len(seqB)
+
+
 
     # calculate the cost for the first column, where seqB[0] = '-'
     for i in range(0, lenA):
@@ -137,13 +139,22 @@ def makeAlignMatrix(costlist, Aseq, Bseq):
 
     # calculate the cost for the rest of the matrix
     for i in range(1, lenA):
+        directions.append([])
         for j in range(1, lenB):
+            dirns = []
             use_j = E[i-1][j] + cost(costlist, seqA[i], '-')
             use_i = E[i][j-1] + cost(costlist, '-', seqB[j])
             use_both = E[i-1][j-1] + cost(costlist, seqA[i], seqB[j])
             E[i].append(min(use_j, use_i, use_both))
+            if E[i][j] == use_j:
+                dirns.append('left')
+            if E[i][j] == use_i:
+                dirns.append('up')
+            if E[i][j] == use_both:
+                dirns.append('diagonal')
+            directions[i-1].append(dirns) 
 
-    return E
+    return (E, directions)
 
 
 def printMatrix(E, seqA, seqB):
@@ -170,7 +181,56 @@ def printMatrix(E, seqA, seqB):
                 sys.stdout.write("{} ".format(E[i][j]))
         sys.stdout.write("\n")
 
+def printWordMatrix(E, seqA, seqB):
+    seqA = '-' + seqA
+    seqB = '-' + seqB
 
+    sys.stdout.write('    ')
+
+
+    sys.stdout.write('\n')
+
+    for i in range(0, len(seqA)-2):
+        sys.stdout.write(" {}| ".format(seqA[i]))
+        for j in range(0, len(seqB)-2):
+            s = '+'
+            sys.stdout.write(" {}| ".format(seqB[i]))
+            s = s.join(E[i][j])
+            sys.stdout.write("{}  ".format(s))
+            for i in range(0, 17-len(s)):
+                sys.stdout.write(" ")
+        sys.stdout.write("\n")
+
+def runTests():
+    seqfiles = ['test_500.txt', 'test_1000.txt', 'test_2000.txt', 'test_4000.txt' , 'test_5000.txt']
+    seqLengths = [500, 1000, 2000, 4000, 5000]
+    costfile = 'imp2cost.txt'
+    costlist = costFileToList(costfile)  # only use costlist via functions
+    seqindex = 0
+    with open("results.txt", "w+") as results:
+        for seqfile in seqfiles:
+            seqlist = seqFileToList(seqfile)
+            count = 1
+            avg = 0
+            for line in seqlist:
+                seqA = line[0]
+                seqB = line[1]
+                start = time.time()
+                E = makeAlignMatrix(costlist, seqA, seqB)[0]
+                end = time.time()
+                avg = ((end-start)+(avg)*(count-1))/count
+                print(str(avg) + '\n')
+                count += 1
+            results.write(str(seqLengths[seqindex]) + "\t" + str(avg) + "\n")
+            seqindex += 1
+
+def getPath(directions, i, j):
+
+    for dirn in directions[i][j]:
+        if(dirn == 'up'):
+            path1 = getPath(directions, i-1, j)
+        elif(dirn == 'left'):
+            path2 = getPath(directions, i, j-1)
 
 # ************* Example usage **********************************
 # seqfile = 'imp2input.txt'
@@ -190,27 +250,22 @@ def printMatrix(E, seqA, seqB):
 # print min
 # ************* Example usage **********************************
 def main():
-    seqfiles = ['test_500.txt', 'test_1000.txt', 'test_2000.txt', 'test_4000.txt' , 'test_5000.txt']
-    seqLengths = [500, 1000, 2000, 4000, 5000]
+    seqfile = 'imp2input.txt'    
     costfile = 'imp2cost.txt'
     costlist = costFileToList(costfile)  # only use costlist via functions
-    seqindex = 0
-    with open("results.txt", "w+") as results:
-        for seqfile in seqfiles:
-            seqlist = seqFileToList(seqfile)
-            count = 1
-            avg = 0
-            for line in seqlist:
-                seqA = line[0]
-                seqB = line[1]
-                start = time.time()
-                E = makeAlignMatrix(costlist, seqA, seqB)
-                end = time.time()
-                avg = ((end-start)+(avg)*(count-1))/count
-                print(str(avg) + '\n')
-                count += 1
-            results.write(str(seqLengths[seqindex]) + "\t" + str(avg) + "\n")
-            seqindex += 1
+    seqlist = seqFileToList(seqfile)
+    #for line in seqlist:
+    # seqA = seqlist[0][0]
+    # seqB = seqlist[0][1]
+    seqA = 'ATCGCT'
+    seqB = 'TTAGTCAT'
+    res = makeAlignMatrix(costlist, seqA, seqB)
+    E = res[0]
+    directions = res[1]
+    printMatrix(E, seqA, seqB)
+    printWordMatrix(directions, seqA, seqB)
+    #printWordMatrix(directions, seqA, seqB)
+    # generate the optimum allignment from E and the direction matrix and output to file
 
     # print "SeqA: {}\nSeqB: {}\n".format(seqA, seqB)
     # cost1 = cost(costlist, 'A', 'G')
