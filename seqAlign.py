@@ -38,17 +38,7 @@ with open(filename, "w") as fp:
 	fp.write("\n")
 	fp.write(str(min))
 fp.close()
-out = open("imp2output.txt", "w")
+ 
+fn.create_out_file(E, seqlist)
 
 ## Here is the output file created
-for i in range(0, len(seqlist)):
-	E = fn.makeAlignMatrix(costlist, seqlist[i][0], seqlist[i][1])
-	A, B, dist = fn.backTrace(E, seqlist[i][0], seqlist[i][1])
-	out.write(A)
-	out.write(",")
-	out.write(B)
-	out.write(":")
-	out.write(str(dist))
-	out.write("\n")
-	
-out.close()

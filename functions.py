@@ -91,7 +91,6 @@ def letterToIdx(x):
 
     return letters.get(x)
 
-
 def makeAlignMatrix(costlist, Aseq, Bseq):
     # declare the alignment matrix E to be a python list
     E = list()
@@ -223,7 +222,21 @@ def edit_string(path, pathLength, seqA, seqB):
 				lenA -= 1
 	
 	return editA[::-1], editB[::-1]			# strings are in reverse so I reversed to normal here
+
 	
+def create_out_file(costMatrix, seqlist):
+	out = open("imp2output.txt", "w")
+	for i in range(0, len(seqlist)):
+		E = makeAlignMatrix(costMatrix, seqlist[i][0], seqlist[i][1])
+		A, B, dist = backTrace(E, seqlist[i][0], seqlist[i][1])
+		out.write(A)
+		out.write(",")
+		out.write(B)
+		out.write(":")
+		out.write(str(dist))
+		out.write("\n")
+		
+	out.close()
 
 # ************* Example usage **********************************
 # seqfile = 'imp2input.txt'
