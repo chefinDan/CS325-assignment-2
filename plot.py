@@ -1,4 +1,4 @@
-import matplotlib
+import matplotlib.pyplot as plotter
 
 def main():
 	return
