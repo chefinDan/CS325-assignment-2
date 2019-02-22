@@ -118,6 +118,7 @@ def makeAlignMatrix(costlist, Aseq, Bseq):
 		E[0].append(E[0][j-1] + cost(costlist, '-', seqB[j]))
 	# calculate the cost for the rest of the matrix
 	for i in range(1, lenA):
+		subcell = []
 		for j in range(1, lenB):
 			cell = []
 			use_j = E[i-1][j] + cost(costlist, seqA[i], '-')
@@ -144,7 +145,8 @@ def makeAlignMatrix(costlist, Aseq, Bseq):
 				cell.append('up')
 			elif mincost == use_both:
 				cell.append('diag')
-		minTrace.append(cell)
+			subcell.append(cell)
+		minTrace.append(subcell)
 
 	return E, minTrace
 
