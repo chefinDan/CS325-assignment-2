@@ -1,4 +1,5 @@
 import sys
+import time
 
 # *********************************************************
 # Example usage of the functions can be found at the bottom
@@ -189,21 +190,33 @@ def printMatrix(E, seqA, seqB):
 # print min
 # ************* Example usage **********************************
 def main():
-    seqfile = 'imp2input.txt'
-    seqlist = seqFileToList(seqfile)
-    seqA = seqlist[0][0]
-    seqB = seqlist[0][1]
-    print "SeqA: {}\nSeqB: {}\n".format(seqA, seqB)
-
+    seqfiles = ['test_500.txt', 'test_1000.txt', 'test_2000.txt', 'test_4000.txt' , 'test_5000.txt']
+    seqLengths = [500, 1000, 2000, 4000, 5000]
     costfile = 'imp2cost.txt'
     costlist = costFileToList(costfile)  # only use costlist via functions
-    cost1 = cost(costlist, 'A', 'G')
-    cost2 = cost(costlist, '-', 'T')
-    cost3 = cost(costlist, 'C', 'T')
+    seqindex = 0
+    with open("results.txt", "w+") as results:
+        for seqfile in seqfiles:
+            seqlist = seqFileToList(seqfile)
+            count = 1
+            avg = 0
+            for line in seqlist:
+                seqA = line[0]
+                seqB = line[1]
+                start = time.time()
+                E = makeAlignMatrix(costlist, seqA, seqB)
+                end = time.time()
+                avg = ((end-start)+(avg)*(count-1))/count
+                print(str(avg) + '\n')
+                count += 1
+            results.write(str(seqLengths[seqindex]) + "\t" + str(avg) + "\n")
+            seqindex += 1
 
-    min = min(cost1, cost2, cost3)
+    # print "SeqA: {}\nSeqB: {}\n".format(seqA, seqB)
+    # cost1 = cost(costlist, 'A', 'G')
+    # cost2 = cost(costlist, '-', 'T')
+    # cost3 = cost(costlist, 'C', 'T')
 
-    print min
 
 if __name__ == "__main__":
     main()
