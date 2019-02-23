@@ -146,12 +146,13 @@ def makeAlignMatrix(costlist, Aseq, Bseq):
             use_i = E[i][j-1] + cost(costlist, '-', seqB[j])
             use_both = E[i-1][j-1] + cost(costlist, seqA[i], seqB[j])
             E[i].append(min(use_j, use_i, use_both))
-            if E[i][j] == use_j:
-                dirns.append('left')
-            if E[i][j] == use_i:
-                dirns.append('up')
             if E[i][j] == use_both:
+                # direction is diagonal
                 dirns.append('diagonal')
+            if E[i][j] == use_j:
+                dirns.append('up')
+            if E[i][j] == use_i:
+                dirns.append('left')
             directions[i-1].append(dirns) 
 
     return (E, directions)
@@ -224,13 +225,51 @@ def runTests():
             results.write(str(seqLengths[seqindex]) + "\t" + str(avg) + "\n")
             seqindex += 1
 
-def getPath(directions, i, j):
+def followPath(directions, i, j):
+    possiblePaths = []
+    minlen = i + j + 1000
+    if i == -1 and j == -1:
+        return ['start']
+    if i == -1:
+        path = followPath(directions, i, j-1)
+        path.append('left')
+        return path
+    if j == -1:
+        path = followPath(directions, i-1, j)
+        path.append('up')
+        return path
 
+    #sys.stdout.write("{} {} {} \n".format(i,j, directions[i][j]))
+
+    # try each path that is listed in the directions list for E[i][j]
     for dirn in directions[i][j]:
-        if(dirn == 'up'):
-            path1 = getPath(directions, i-1, j)
-        elif(dirn == 'left'):
-            path2 = getPath(directions, i, j-1)
+        # left path goes to E[]
+        if dirn == 'left':
+            path = followPath(directions, i, j-1)
+            path.append(dirn)
+            possiblePaths.append(path)
+        if dirn == 'up':
+            path = followPath(directions, i-1, j)
+            path.append(dirn)
+            possiblePaths.append(path)
+        if dirn == 'diagonal':
+            path = followPath(directions, i-1, j-1)
+            path.append(dirn)
+            possiblePaths.append(path)
+
+    for path in possiblePaths:
+        if len(path) < minlen:
+            minlen = len(path)
+
+    for option in possiblePaths:
+        if len(option) == minlen:
+            return option
+
+
+    return ['fail']
+
+
+
 
 # ************* Example usage **********************************
 # seqfile = 'imp2input.txt'
@@ -255,15 +294,15 @@ def main():
     costlist = costFileToList(costfile)  # only use costlist via functions
     seqlist = seqFileToList(seqfile)
     #for line in seqlist:
-    # seqA = seqlist[0][0]
-    # seqB = seqlist[0][1]
-    seqA = 'ATCGCT'
-    seqB = 'TTAGTCAT'
+    seqA = seqlist[0][0]
+    seqB = seqlist[0][1]
     res = makeAlignMatrix(costlist, seqA, seqB)
     E = res[0]
     directions = res[1]
     printMatrix(E, seqA, seqB)
-    printWordMatrix(directions, seqA, seqB)
+    answer = followPath(directions, len(seqA)-1, len(seqB)-1)
+    print(answer)
+    #printWordMatrix(directions, seqA, seqB)
     #printWordMatrix(directions, seqA, seqB)
     # generate the optimum allignment from E and the direction matrix and output to file
 
