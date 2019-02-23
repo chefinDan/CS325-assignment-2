@@ -111,7 +111,7 @@ def letterToIdx(x):
 def makeAlignMatrix(costlist, Aseq, Bseq):
     # declare the alignment matrix E to be a python list
     E = list()
-    directions = []
+    directions = list()
     # add a blank ('-') character to the beggining of each sequence,
     # save the length of each sequence to a variable
     seqA = '-' + Aseq
@@ -124,36 +124,41 @@ def makeAlignMatrix(costlist, Aseq, Bseq):
     # calculate the cost for the first column, where seqB[0] = '-'
     for i in range(0, lenA):
         E.append(list())  # each iteration adds a new row to column 0
+        directions.append(list())
         if i == 0:  # the very first element, has no previous element
             E[i].append(cost(costlist, seqA[i], '-'))
+            directions[i].append(['start'])
         else:
             # the current row gets the cost of the previous row plus the cost
             # of aligning the current letter with '-'
             E[i].append(E[i-1][0] + cost(costlist, seqA[i], '-'))
+            directions[i].append(['up'])
+
 
     # calculate the cost for the first row, where seqA[0] = '-'
     for j in range(1, lenB):  # start at 1, 0'th element is already calculated
         # Each element of the first row gets the cost of the previous element
         # plus the cost of aligning with '-'
         E[0].append(E[0][j-1] + cost(costlist, '-', seqB[j]))
+        directions[0].append(['left'])
 
     # calculate the cost for the rest of the matrix
     for i in range(1, lenA):
-        directions.append([])
         for j in range(1, lenB):
             dirns = []
             use_j = E[i-1][j] + cost(costlist, seqA[i], '-')
             use_i = E[i][j-1] + cost(costlist, '-', seqB[j])
             use_both = E[i-1][j-1] + cost(costlist, seqA[i], seqB[j])
             E[i].append(min(use_j, use_i, use_both))
-            if E[i][j] == use_both:
+            minimum = min(use_j, use_i, use_both)
+            if minimum == use_both:
                 # direction is diagonal
                 dirns.append('diagonal')
-            if E[i][j] == use_j:
+            if minimum == use_j:
                 dirns.append('up')
-            if E[i][j] == use_i:
+            if minimum == use_i:
                 dirns.append('left')
-            directions[i-1].append(dirns) 
+            directions[i].append(dirns) 
 
     return (E, directions)
 
@@ -187,18 +192,18 @@ def printWordMatrix(E, seqA, seqB):
     seqB = '-' + seqB
 
     sys.stdout.write('    ')
-
-
+    for i in range(0, len(seqB)):
+        sys.stdout.write('{0: <3}'.format(seqB[i]))
     sys.stdout.write('\n')
 
-    for i in range(0, len(seqA)-2):
+
+    for i in range(0, len(E)):
         sys.stdout.write(" {}| ".format(seqA[i]))
-        for j in range(0, len(seqB)-2):
+        for j in range(0, len(E[i])):
             s = '+'
-            sys.stdout.write(" {}| ".format(seqB[i]))
-            s = s.join(E[i][j])
-            sys.stdout.write("{}  ".format(s))
-            for i in range(0, 17-len(s)):
+            printstr = s.join(E[i][j])
+            sys.stdout.write("{} ".format(printstr))
+            for k in range(0, 17-len(printstr)):
                 sys.stdout.write(" ")
         sys.stdout.write("\n")
 
@@ -228,22 +233,15 @@ def runTests():
 def followPath(directions, i, j):
     possiblePaths = []
     minlen = i + j + 1000
-    if i == -1 and j == -1:
-        return ['start']
-    if i == -1:
-        path = followPath(directions, i, j-1)
-        path.append('left')
-        return path
-    if j == -1:
-        path = followPath(directions, i-1, j)
-        path.append('up')
-        return path
+    if i == 0 and j == 0:
+        return['start'] 
 
     #sys.stdout.write("{} {} {} \n".format(i,j, directions[i][j]))
 
+
     # try each path that is listed in the directions list for E[i][j]
     for dirn in directions[i][j]:
-        # left path goes to E[]
+        # left path goes to E[i-1][j]
         if dirn == 'left':
             path = followPath(directions, i, j-1)
             path.append(dirn)
@@ -269,7 +267,42 @@ def followPath(directions, i, j):
     return ['fail']
 
 
+def wordFromBacktrace(path, seq, left_is_space):
+    newWord = ""
+    i = 0
+    if(left_is_space):
+        for dirn in path:
+            if dirn == 'left':
+                newWord += '-'
+            elif dirn == 'up':
+                newWord += seq[i]
+                i += 1
+            elif dirn == 'diagonal':
+                newWord += seq[i]
+                i += 1
+            if dirn == 'fail':
+                return ""
+    else:
+        for dirn in path:
+            if dirn == 'left':
+                newWord += seq[i]
+                i += 1
+            elif dirn == 'up':
+                newWord += '-'
+            elif dirn == 'diagonal':
+                newWord += seq[i]
+                i += 1
+            if dirn == 'fail':
+                return ""
 
+    return newWord
+
+def getAlignmentCost(costList, seqA,seqB):
+    total = 0
+    for i in range(len(seqA)):
+        total += cost(costList, seqA[i],seqB[i])
+
+    return total
 
 # ************* Example usage **********************************
 # seqfile = 'imp2input.txt'
@@ -293,15 +326,22 @@ def main():
     costfile = 'imp2cost.txt'
     costlist = costFileToList(costfile)  # only use costlist via functions
     seqlist = seqFileToList(seqfile)
-    #for line in seqlist:
-    seqA = seqlist[0][0]
-    seqB = seqlist[0][1]
-    res = makeAlignMatrix(costlist, seqA, seqB)
-    E = res[0]
-    directions = res[1]
-    printMatrix(E, seqA, seqB)
-    answer = followPath(directions, len(seqA)-1, len(seqB)-1)
-    print(answer)
+
+    with open('imp2output.txt', 'w') as outputfile:
+        for line in seqlist:
+            seqA = line[0]
+            seqB = line[1]
+
+            res = makeAlignMatrix(costlist, seqA, seqB)
+            E = res[0]
+            directions = res[1]
+            # for line in directions:
+            #     print(line)
+            answer = followPath(directions, len(seqA), len(seqB))
+            alignment1 = wordFromBacktrace(answer, seqB, False)
+            alignment2 = wordFromBacktrace(answer, seqA, True)
+            outstring = alignment1 + ',' + alignment2 + ':' + str(getAlignmentCost(costlist,alignment1,alignment2)) + '\n'
+            outputfile.write(outstring)
     #printWordMatrix(directions, seqA, seqB)
     #printWordMatrix(directions, seqA, seqB)
     # generate the optimum allignment from E and the direction matrix and output to file
