@@ -280,13 +280,18 @@ def edit_string(path, seqA, seqB):
 def create_out_file(costMatrix, seqlist):
 	out = open("imp2output.txt", "w")
 	for i in range(0, len(seqlist)):
-		E = makeAlignMatrix(costMatrix, seqlist[i][0], seqlist[i][1])
-		A, B, dist = backTrace(E, seqlist[i][0], seqlist[i][1])
+		pair = makeAlignMatrix(costMatrix, seqlist[i][0], seqlist[i][1])
+		len1 = len(seqlist[i][0])
+		len2 = len(seqlist[i][1])
+		E = pair[0]
+		dir = pair[1]
+		dist = followPath(dir, len1 -1, len2-1)
+		A, B = edit_string(dist, seqlist[i][0], seqlist[1][0])
 		out.write(A)
 		out.write(",")
 		out.write(B)
 		out.write(":")
-		out.write(str(dist))
+		out.write(str(E[len(E)-1][len(E[0])-1]))
 		out.write("\n")
 		
 	out.close()

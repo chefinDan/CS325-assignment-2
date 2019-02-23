@@ -31,8 +31,6 @@ print 'Optimal Alignment Cost: {}'.format(E[len(seqA)][len(seqB)])
 
 path = fn.followPath(directions, len(seqA) -1, len(seqB)-1)
 list1, list2 = fn.edit_string(path, seqA, seqB)
-print path
-print list1, list2
 filename = "output.txt"
 ## Testing file
 with open(filename, "w") as fp:
@@ -43,6 +41,6 @@ with open(filename, "w") as fp:
 	fp.write(str(E[len(E)-1][len(E[0])-1]))
 fp.close()
  
-#fn.create_out_file(E, seqlist)
+fn.create_out_file(costlist, seqlist)
 
 ## Here is the output file created
