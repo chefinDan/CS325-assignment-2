@@ -230,7 +230,28 @@ def runTests():
             results.write(str(seqLengths[seqindex]) + "\t" + str(avg) + "\n")
             seqindex += 1
 
-def followPath(directions, i, j):
+def getPath(directions, i, j):
+    if i == 0 and j == 0:
+        return['start'] 
+
+    # try each path that is listed in the directions list for E[i][j]
+        # left path goes to E[i-1][j]
+    if directions[i][j][0] == 'diagonal':
+        path = getPath(directions, i-1, j-1)
+        path.append('diagonal')
+        return path
+    elif directions[i][j][0] == 'left':
+        path = getPath(directions, i, j-1)
+        path.append('left')
+        return path
+    elif directions[i][j][0] == 'up':
+        path = getPath(directions, i-1, j)
+        path.append('up')
+        return path
+
+
+
+def getOptimumPath(directions, i, j):
     possiblePaths = []
     minlen = i + j + 1000
     if i == 0 and j == 0:
@@ -243,15 +264,15 @@ def followPath(directions, i, j):
     for dirn in directions[i][j]:
         # left path goes to E[i-1][j]
         if dirn == 'left':
-            path = followPath(directions, i, j-1)
+            path = getOptimumPath(directions, i, j-1)
             path.append(dirn)
             possiblePaths.append(path)
         if dirn == 'up':
-            path = followPath(directions, i-1, j)
+            path = getOptimumPath(directions, i-1, j)
             path.append(dirn)
             possiblePaths.append(path)
         if dirn == 'diagonal':
-            path = followPath(directions, i-1, j-1)
+            path = getOptimumPath(directions, i-1, j-1)
             path.append(dirn)
             possiblePaths.append(path)
 
@@ -337,7 +358,7 @@ def main():
             directions = res[1]
             # for line in directions:
             #     print(line)
-            answer = followPath(directions, len(seqA), len(seqB))
+            answer = getPath(directions, len(seqA), len(seqB))
             alignment1 = wordFromBacktrace(answer, seqB, False)
             alignment2 = wordFromBacktrace(answer, seqA, True)
             outstring = alignment1 + ',' + alignment2 + ':' + str(getAlignmentCost(costlist,alignment1,alignment2)) + '\n'
